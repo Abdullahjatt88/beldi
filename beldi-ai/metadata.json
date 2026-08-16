@@ -1,0 +1,6 @@
+{
+  "name": "Build X",
+  "description": "Beldi AI - Advanced conversational assistant and universal website/app builder by Build X. Chat, reason, code, and generate live interactive web applications in real time.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
