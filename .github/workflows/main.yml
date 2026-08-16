@@ -1,0 +1,63 @@
+name: Unzip Archive
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check ZIP
+        run: |
+          echo "Files in repository:"
+          ls -lah
+
+          if [ ! -f "beldi-ai.zip" ]; then
+            echo "ERROR: beldi-ai.zip not found!"
+            exit 1
+          fi
+
+          echo "ZIP found:"
+          ls -lh "beldi-ai.zip"
+
+          echo "Testing ZIP..."
+          unzip -t "beldi-ai.zip"
+
+      - name: Extract ZIP
+        run: |
+          rm -rf extracted-folder
+          mkdir extracted-folder
+
+          unzip -o "beldi-ai.zip" -d extracted-folder
+
+      - name: Remove nested Git files
+        run: |
+          rm -rf extracted-folder/.git
+          find extracted-folder -type d -name ".git" -prune -exec rm -rf {} +
+
+      - name: Move project to repository root
+        run: |
+          cp -r extracted-folder/. .
+          rm -rf extracted-folder
+
+      - name: Remove ZIP
+        run: |
+          rm -f "beldi-ai.zip"
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions"
+
+          git add -A
+
+          git diff --cached --quiet || git commit -m "Extract Beldi AI project from ZIP"
+
+          git push
