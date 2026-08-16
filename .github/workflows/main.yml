@@ -1,4 +1,4 @@
-name: Unzip Archive
+name: Unpack RAR
 
 on:
   workflow_dispatch:
@@ -14,28 +14,30 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Check ZIP
+      - name: Check RAR
         run: |
           echo "Files in repository:"
           ls -lah
 
-          if [ ! -f "beldi-ai.zip" ]; then
-            echo "ERROR: beldi-ai.zip not found!"
+          if [ ! -f "beldi-ai.rar" ]; then
+            echo "ERROR: beldi-ai.rar not found!"
             exit 1
           fi
 
-          echo "ZIP found:"
-          ls -lh "beldi-ai.zip"
+          echo "RAR found:"
+          ls -lh "beldi-ai.rar"
 
-          echo "Testing ZIP..."
-          unzip -t "beldi-ai.zip"
+      - name: Install 7-Zip
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y p7zip-full
 
-      - name: Extract ZIP
+      - name: Extract RAR
         run: |
           rm -rf extracted-folder
           mkdir extracted-folder
 
-          unzip -o "beldi-ai.zip" -d extracted-folder
+          7z x "beldi-ai.rar" -oextracted-folder -y
 
       - name: Remove nested Git files
         run: |
@@ -47,9 +49,9 @@ jobs:
           cp -r extracted-folder/. .
           rm -rf extracted-folder
 
-      - name: Remove ZIP
+      - name: Remove RAR
         run: |
-          rm -f "beldi-ai.zip"
+          rm -f "beldi-ai.rar"
 
       - name: Commit and Push
         run: |
@@ -58,6 +60,6 @@ jobs:
 
           git add -A
 
-          git diff --cached --quiet || git commit -m "Extract Beldi AI project from ZIP"
+          git diff --cached --quiet || git commit -m "Extract Beldi AI project from RAR"
 
           git push
